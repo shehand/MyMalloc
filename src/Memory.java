@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class Memory {
 
-    static byte Memory[] = new byte[25000];
+   static byte Memory[] = new byte[25000];
     static byte initialized = 0; // memory is not initialized;
     static int initBlock = 0; // initializing block
 //    static int headerSize = 200;
@@ -21,7 +21,7 @@ public class Memory {
     private static int remainSize = 25000 - arrayListSize;
     static int head = 0;
     private static ArrayList<int[]> freeBlocks = new ArrayList<>();
-    
+    private static ArrayList<int[]> allocatedBlocks = new ArrayList<>();
 
     void myMalloc(int size, int memoryID) {
         // memory is not initialized
@@ -29,9 +29,14 @@ public class Memory {
             System.out.println("Memory is initializing ... ");
             initialized = 1;
             Memory[initBlock] = 1;
-            myMalloc(size, memoryID);
+            Memory[24999] = 1; // for hold freeblock arraylist
+            Memory[24998] = 1; // for hold allocated blocks arraylist
 
-            System.out.println("Availabel Space for Allocations :" + (24999 - arrayListSize) + " MB");
+            int tmp[] = {24999, 1, 25000};
+            freeBlocks.add(tmp);
+            System.out.println("Availabel Space for Allocations :" + (24997 - arrayListSize) + " MB");
+
+            myMalloc(size, memoryID);
         } else {
             // variable to check whether a suitable space to allocate is found or not
             int memoryDetected = 0;
@@ -41,8 +46,8 @@ public class Memory {
             while (memoryDetected == 0) {
 
                 int[] previouseBlock = freeBlocks.get(0);
-                
-                // check through the free blocks for a sutable apace
+
+                // check through the free blocks for a suitable apace
                 for (int j = 0; j < freeBlocks.size(); j++) {
                     int tmp[] = freeBlocks.get(j);
 
@@ -62,13 +67,17 @@ public class Memory {
             }
 
             if (memoryDetected != -1) {
-                for(int i=0;i<size;i++){
-                    Memory[memoryDetected+i] = 1;
+                for (int i = 0; i < size; i++) {
+                    Memory[memoryDetected + i] = 1;
                 }
+                int tmp[] = {memoryID, memoryDetected, size};
+                allocatedBlocks.add(tmp);
+                // calculate free spaces again when done allocating
                 freeBlocks.clear();
                 calculateFreeBlocks();
+                System.out.println("Memory has been allocated for memory id : " + memoryID);
             } else {
-                System.out.println("Sorry! Can't find a suitable memory location for memory id : "+memoryID);
+                System.out.println("Sorry! Can't find a suitable memory location for memory id : " + memoryID);
             }
         }
     }
@@ -90,15 +99,35 @@ public class Memory {
             }
         }
         freeBlocks.trimToSize();
-        arrayListSize = freeBlocks.size() * 3;
+        allocatedBlocks.trimToSize();
+        arrayListSize = freeBlocks.size() * 3 + allocatedBlocks.size() * 3;
     }
-    
-    void free(int memoryID){
-        if(freeBlocks.isEmpty()){
+
+    void myFree(int memoryID) {
+        if (initialized == 0) {
             System.out.println("Memory is already empty!");
-        }else{
-            
+        } else {
+            int cleared = -1;
+            for (int i = 0; i < allocatedBlocks.size(); i++) {
+                int tmp[] = allocatedBlocks.get(i);
+                if (memoryID == tmp[0]) {
+                    for (int j = 0; j < tmp[2]; j++) {
+                        Memory[tmp[1] + j] = 0;
+                    }
+                    cleared = i;
+                }
+            }
+
+            if (cleared == -1) {
+                System.out.println("Sorry! Can't find the specific memory to clean");
+            } else {
+                System.out.println("Memory location for id :" + memoryID + " is successfully cleared");
+                allocatedBlocks.remove(cleared);
+            }
         }
     }
 
+    void printMemoryStack() {
+
+    }
 }
