@@ -127,7 +127,18 @@ public class Memory {
         }
     }
 
-    void printMemoryStack() {
-
+     void printMemoryStack() {
+        System.out.println("Initializing Memory Allocation : "+1+" MB");
+        
+        for(int i=0;i<allocatedBlocks.size();i++){
+            int tmp[] = allocatedBlocks.get(i);
+            System.out.println("Memory ID : "+tmp[0]+" From Register ID : "+tmp[1]+" To Register ID : "+(tmp[1]+tmp[2]));
+        }
+//        for(int i=0;i<freeBlocks.size();i++){
+//            int tmp[] = freeBlocks.get(i);
+//            System.out.println("Memory is Free From Register ID :"+tmp[1]+" To Register ID : "+tmp[2]);
+//        }
+        
+        System.out.println("Memory for the Memory Headers : "+allocatedBlocks.size()+"+"+freeBlocks.size());
     }
 }
