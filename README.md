@@ -10,6 +10,6 @@ A java package that acts as mymalloc in C
 
 ### Methods Used
 
-> - mymalloc(memory id, memory size) for allocation
-> - myfree(memory id) for free memory sots
-> - print function to print the memory stack
+> - mymalloc(memory id, memory size) for allocation.
+> - myfree(memory id) for free memory sots.
+> - print function to print the memory stack.
